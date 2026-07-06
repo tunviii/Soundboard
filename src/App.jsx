@@ -83,7 +83,7 @@ function App() {
         </label>
 
         <button className="pause-button" type="button" onClick={pauseAudio}>
-          Pause
+          Pause Audio
         </button>
       </div>
 
