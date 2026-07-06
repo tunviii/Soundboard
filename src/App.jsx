@@ -17,7 +17,7 @@ import wetfart from "./assets/wetfart.mp3";
 import baigan from "./assets/baigan.mp3";
 function App() {
   const [volume, setVolume] = useState(0.75);
-  const activeAudiosRef = useRef([]);
+  const currentAudioRef = useRef(null);
 
   const sounds = [
     { id: 1, name: "Italian Brainrot", file: bc },
@@ -34,15 +34,27 @@ function App() {
     { id: 12, name: "Baigan", file: baigan },
   ];
 
+  const stopCurrentAudio = () => {
+    if (!currentAudioRef.current) {
+      return;
+    }
+
+    currentAudioRef.current.pause();
+    currentAudioRef.current.currentTime = 0;
+    currentAudioRef.current = null;
+  };
+
   const playSound = (sound) => {
+    stopCurrentAudio();
+
     const audio = new Audio(sound);
     audio.volume = volume;
-    activeAudiosRef.current.push(audio);
+    currentAudioRef.current = audio;
 
     audio.addEventListener("ended", () => {
-      activeAudiosRef.current = activeAudiosRef.current.filter(
-        (activeAudio) => activeAudio !== audio
-      );
+      if (currentAudioRef.current === audio) {
+        currentAudioRef.current = null;
+      }
     });
 
     audio.play();
@@ -52,15 +64,15 @@ function App() {
     const nextVolume = Number(event.target.value);
     setVolume(nextVolume);
 
-    activeAudiosRef.current.forEach((audio) => {
-      audio.volume = nextVolume;
-    });
+    if (currentAudioRef.current) {
+      currentAudioRef.current.volume = nextVolume;
+    }
   };
 
   const pauseAudio = () => {
-    activeAudiosRef.current.forEach((audio) => {
-      audio.pause();
-    });
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+    }
   };
 
   return (
